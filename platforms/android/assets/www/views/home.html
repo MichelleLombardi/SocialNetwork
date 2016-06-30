@@ -1,0 +1,66 @@
+<html>
+
+<head>
+    <style>
+        ul > li {
+            display: inline-block;
+            margin-left: 25%;
+            /* This is when the drop down box appears */
+            width: auto;
+            position: relative;
+        }
+        
+        button {
+            white-space: normal;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Instagram</h3>
+            </div>
+            <div class="panel-body  style=" position: absolute; height:100%; "">
+                <div ui-view></div>
+            </div>
+
+
+
+
+
+            <div class="panel-footer">
+                <div class="buttons">
+                    <div class="btn-group btn-group-justified">
+                        <a ui-sref="home" class="btn btn-default" role="button"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
+                        <a ui-sref="#" class="btn btn-default" role="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                        <div class="btn-group dropup">
+                            <a type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> <span class="caret"></span>
+          </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <div class="btn-toolbar pagination-centered">
+                                        <div class="btn-group " role="group">
+                                            <a ui-sref="home.takePicture" class="btn btn-default" ng-click="takePicture()" role="button">
+                                                <span class="glyphicon glyphicon-camera" aria-hidden="true"></span>
+                                            </a>
+                                            <a ui-sref="home.upload" class="btn btn-default" role="button">
+                                                <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <a ui-sref="home.profile" class="btn btn-default" role="button"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /container -->
+    <script type="text/javascript" src="app.js"></script>
+</body>
+
+</html>

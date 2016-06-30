@@ -1,0 +1,22 @@
+<html>
+    <body>
+    <div class="container">
+        <div class="jumbotron">
+            <h2 class="form-signin-heading">Please sign in</h2>
+           <label for="inputnn" class="sr-only">Nickname</label>
+            <input type="text" id="inputnnlogin" class="form-control" placeholder="Nickname" required>
+            <label for="inputplogin" class="sr-only">Password</label>
+            <input type="password" id="inputplogin" class="form-control" placeholder="Password" required>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="remember-me"> Remember me
+              </label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" id="login_button" ng-click="login()">Sign in</button>  
+            <a ui-sref="register">Don't have an account?</a>
+        </div>
+    </div> <!-- /container -->
+<!--        <script type="text/javascript" src="js/login.js"></script>-->
+        <script type="text/javascript" src="app.js"></script>
+    </body>
+</html>

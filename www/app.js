@@ -219,7 +219,7 @@ app.controller("UploadCtrl", ["$scope", "$http",
 
                 reader.onload = function (e) {
                     $('#img').attr('src', e.target.result);
-                }
+                } 
 
                 reader.readAsDataURL(input.files[0]);
             }

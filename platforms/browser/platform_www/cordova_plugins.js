@@ -36,7 +36,8 @@ module.exports.metadata =
 {
     "cordova-plugin-whitelist": "1.2.2",
     "cordova-plugin-compat": "1.0.0",
-    "cordova-plugin-camera": "2.2.0"
+    "cordova-plugin-camera": "2.2.0",
+    "cordova-plugin-geolocation": "2.2.0"
 }
 // BOTTOM OF METADATA
 });

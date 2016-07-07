@@ -1,4 +1,47 @@
-<div>
-    Publishes
-        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<div ng-controller="IndexCtrl">
+    <div class="row" ng-repeat="x in publish">
+        <div ng-if="x.media_type_publish == 'image'">
+            <div class="col-sm-8 col-sm-offset-2">
+                <div class="container">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">{{x.nickname_app_user}}</h3>
+                        </div>
+                        <div class="panel-body">
+                            <img  ng-src="{{x.media_publish}}" alt="" id="{{x.id_publish}}" class="img-thumbnail" width="100%" ></img>
+                        </div>
+
+                        <div class="panel-footer">
+
+                        </div>
+
+                    </div>
+                </div>
+                <label class="btn btn-success" id="labelup" ng-click="upload()">
+                </label>
+            </div>
+        </div>
+           <div ng-if="x.media_type_publish == 'video'">
+            <div class="col-sm-8 col-sm-offset-2">
+                <div class="container">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">{{x.nickname_app_user}}</h3>
+                        </div>
+                        <div class="panel-body">
+                            <video  ng-src="{{x.media_publish}}" alt="" id="{{x.id_publish}}" width="100%" controls></video>
+                        </div>
+                        
+                        <div class="panel-footer">
+
+                        </div>
+
+                    </div>
+                </div>
+                <label class="btn btn-success" id="labelup" ng-click="upload()">
+                </label>
+            </div>
+        </div>
+
+    </div>
 </div>

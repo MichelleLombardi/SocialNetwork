@@ -50,7 +50,7 @@ public class Login extends HttpServlet {
 				System.out.println(nickname+ " "+password );
 				w.setConnection("localhost", "5432", "instagram", "postgres", "masterkey");
 				Object [] params = {nickname,password};
-				w.executeQueryX("SELECT COUNT(*) OVER (), c.access_token_app_user FROM app_user c WHERE c.nickname_app_user=? AND c.password_app_user=?",params);
+				w.executeQueryX("SELECT COUNT(*) OVER (), c.access_token_app_user, c.id_app_user, c.nickname_app_user FROM app_user c WHERE c.nickname_app_user=? AND c.password_app_user=?",params);
 				JBuilder json = new JBuilder();
 				json.add("count",w.getTable());
 				System.out.println(json.getJBuilder());
@@ -60,6 +60,8 @@ public class Login extends HttpServlet {
 				if(count[5].equals("1")){
 					json2.add("response","OK" );
 					json2.add("token", count[9]);
+					json2.add("id", count[13]);
+					json2.add("nick", count[21]);
 					out.print(json2.getJBuilder());
 				}
 				else{

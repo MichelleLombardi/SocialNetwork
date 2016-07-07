@@ -68,7 +68,7 @@ app.controller("RegisterCtrl", ["$scope", "$http", "$state",
         $scope.register = function () {
 
             $.ajax({
-                url: "http://192.168.2.7:8080/Instagram_server/Signup",
+                url: "http://localhost:8080/Instagram_server/Signup",
                 type: "POST",
                 data: {
                     firstName: document.getElementById('inputn').value, // input  firt name del modal2
@@ -125,7 +125,7 @@ app.controller("LoginCtrl", ["$scope", "$http", "$state",
         }
         $scope.login = function () {
             $.ajax({
-                url: "http://192.168.2.7:8080/Instagram_server/Login",
+                url: "http://localhost:8080/Instagram_server/Login",
                 type: "POST",
                 data: {
                     nickname: document.getElementById('inputnnlogin').value, // input  birthday del modal2
@@ -139,6 +139,8 @@ app.controller("LoginCtrl", ["$scope", "$http", "$state",
                         window.localStorage.removeItem("token");
                         if (CryptoJS.MD5(document.getElementById('inputnnlogin').value).toString() == data.token) {
                             window.localStorage.setItem("token", data.token);
+                            window.localStorage.setItem("id", data.id);
+                            window.localStorage.setItem("nick", data.nick);
                             $state.go('home.index');
                         }
                         document.getElementById('inputnnlogin').value = "";
@@ -205,7 +207,12 @@ app.controller("TakePictureCtrl", ["$scope", "$http",
 
 app.controller("UploadCtrl", ["$scope", "$http",
     function ($scope, $http) {
+        var label = document.getElementById("labelup");
+        var vid = document.getElementById("vid");
         var img = document.getElementById('img');
+        label.style.display = "block";
+        vid.style.display = "none";
+        img.style.display = "none";
         var filebtn = document.getElementById("myFile");
         filebtn.addEventListener("change", capturePhoto);
 
@@ -218,13 +225,49 @@ app.controller("UploadCtrl", ["$scope", "$http",
                 var reader = new FileReader();
 
                 reader.onload = function (e) {
-                    $('#img').attr('src', e.target.result);
+                    var file = filebtn.files[0].type;
+                    file = file.split("/");
+                    if (file[0] == "image") {
+                        label.style.display = "none";
+                        img.style.display = "block";
+                        $('#img').attr('src', e.target.result);
+                    }
+                    if (file[0] == "audio") {
+                        label.style.display = "none";
+                        vid.style.display = "block";
+                        $('#vid').attr('src', e.target.result);
+                    }
+                    if (file[0] == "video") {
+                        label.style.display = "none";
+                        vid.style.display = "block";
+                        $('#vid').attr('src', e.target.result);
+                    }
                 }
 
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-
+        $scope.upload = function () {
+            var formData = new FormData();
+            formData.append("file", filebtn.files[0]);
+            formData.append("nick", window.localStorage.getItem("nick"));
+            formData.append("id", window.localStorage.getItem("id"));
+            formData.append("tags", "");
+            formData.append("desc", "");
+            
+            $http({
+                method: "POST",
+                url: "http://localhost:8080/Instagram_server/upload",
+                data: formData,
+                headers: {
+                    "Content-Type": undefined
+                }
+                
+            }).success(function (data) {
+                console.log(data);
+            });
+//    
+        }
     }
 ]);

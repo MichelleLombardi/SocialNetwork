@@ -22,6 +22,11 @@ app.config(["$stateProvider", "$urlRouterProvider",
                 "templateUrl": "views/index.html",
                 "controller": "IndexCtrl"
             })
+            .state("home.search", {
+                "url": "/search",
+                "templateUrl": "views/search.html",
+                "controller": "SearchCtrl"
+            })
             .state("home.takePicture", {
                 "url": "/take-picture",
                 "templateUrl": "views/take-picture.html",
@@ -45,6 +50,46 @@ app.config(["$stateProvider", "$urlRouterProvider",
 
     }
 ]);
+
+
+app.controller("SearchCtrl", ["$scope", "$http", "$state", "$sce",
+
+    function ($scope, $http, $state, $sce) {
+        $scope.publish = [];
+        $scope.signout = function () {
+            window.localStorage.removeItem("token");
+            $state.go('login');
+        }
+
+        $scope.searchf = function () {
+             $http({
+            method: "POST",
+            url: "http://localhost:8080/Instagram_server/get_publishes",
+            data: "type=" + "2"+"&se="+document.getElementById("inp-search").value,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).success(function (data) {
+            console.log(data);
+            alert();
+            $scope.publish = data.publishes.map(function (el) {
+                if (el.media_type_publish === "image") {
+
+                    el.media_publish = $sce.trustAsResourceUrl("http://localhost:8080/Instagram_server/get-file?path=" + el.media_publish + "&nm=" + el.title_publishs);
+                } else {
+                    el.media_publish = $sce.trustAsResourceUrl("http://localhost:8080/Instagram_server/get-video?path=" + el.media_publish);
+                }
+
+                return el;
+            });
+            console.log($scope.publish);
+        });
+        }
+       
+    }
+
+]);
+
 
 app.controller("ProfileCtrl", ["$scope", "$http", "$state",
 
@@ -191,13 +236,50 @@ app.controller("HomeCtrl", ["$scope", "$http", "$state",
     }
 ]);
 
-app.controller("IndexCtrl", ["$scope", "$http", "$state",
-    function ($scope, $http, $state) {
+app.config(function ($sceDelegateProvider) {
+    $sceDelegateProvider.resourceUrlWhitelist([
+   // Allow same origin resource loads.
+   'self',
+   // Allow loading from our assets domain.  Notice the difference between * and **.
+   'http://localhost:8080/Instagram_server/**']);
+});
+
+app.controller("IndexCtrl", ["$scope", "$http", "$state", "$sce",
+    function ($scope, $http, $state, $sce) {
         if (!window.localStorage.getItem("token")) {
             $state.go('login');
         }
-    }
-]);
+
+        var formData = new FormData();
+        formData.append("type", "1");
+
+        $http({
+            method: "POST",
+            url: "http://localhost:8080/Instagram_server/get_publishes",
+            data: "type=" + "1",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+        }).success(function (data) {
+            console.log(data);
+            $scope.publish = data.publishes.map(function (el) {
+                if (el.media_type_publish === "image") {
+
+                    el.media_publish = $sce.trustAsResourceUrl("http://localhost:8080/Instagram_server/get-file?path=" + el.media_publish + "&nm=" + el.title_publishs);
+                } else {
+                    el.media_publish = $sce.trustAsResourceUrl("http://localhost:8080/Instagram_server/get-video?path=" + el.media_publish);
+                }
+
+                return el;
+            });
+            console.log(data.publishes);
+        });
+
+
+
+                }
+                ]);
 
 app.controller("TakePictureCtrl", ["$scope", "$http",
     function ($scope, $http) {
@@ -227,17 +309,18 @@ app.controller("UploadCtrl", ["$scope", "$http",
                 reader.onload = function (e) {
                     var file = filebtn.files[0].type;
                     file = file.split("/");
-                    if (file[0] == "image") {
+                    file = file[0];
+                    if (file == "image") {
                         label.style.display = "none";
                         img.style.display = "block";
                         $('#img').attr('src', e.target.result);
                     }
-                    if (file[0] == "audio") {
+                    if (file == "audio") {
                         label.style.display = "none";
                         vid.style.display = "block";
                         $('#vid').attr('src', e.target.result);
                     }
-                    if (file[0] == "video") {
+                    if (file == "video") {
                         label.style.display = "none";
                         vid.style.display = "block";
                         $('#vid').attr('src', e.target.result);
@@ -249,25 +332,75 @@ app.controller("UploadCtrl", ["$scope", "$http",
         }
 
         $scope.upload = function () {
-            var formData = new FormData();
-            formData.append("file", filebtn.files[0]);
-            formData.append("nick", window.localStorage.getItem("nick"));
-            formData.append("id", window.localStorage.getItem("id"));
-            formData.append("tags", "");
-            formData.append("desc", "");
-            
-            $http({
-                method: "POST",
-                url: "http://localhost:8080/Instagram_server/upload",
-                data: formData,
-                headers: {
-                    "Content-Type": undefined
-                }
-                
-            }).success(function (data) {
-                console.log(data);
-            });
-//    
+
+            var options = {
+                enableHighAccuracy: true,
+                maximumAge: 3600000
+            }
+            var locat = "";
+
+            var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+            function onSuccess(position) {
+                var geocoder;
+                geocoder = new google.maps.Geocoder();
+                var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+                geocoder.geocode({
+                        'latLng': latlng
+                    },
+                    function (results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            if (results[0]) {
+                                var add = results[0].formatted_address;
+                                var value = add.split(",");
+
+                                count = value.length;
+                                country = value[count - 1];
+                                state = value[count - 2];
+                                city = value[count - 3];
+                                locat = city + "," + state;
+                                send();
+                            } else {
+                                alert("address not found");
+                            }
+                        } else {
+                            alert("Geocoder failed due to: " + status);
+                        }
+                    }
+                );
+            };
+
+            function onError(error) {
+                alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
+            }
+
+
+            function send() {
+                var type = filebtn.files[0].type;
+                type = type.split('/');
+                type = type[0];
+                var formData = new FormData();
+                formData.append("file", filebtn.files[0]);
+                formData.append("nick", window.localStorage.getItem("nick"));
+                formData.append("id", window.localStorage.getItem("id"));
+                formData.append("type", type);
+                formData.append("tags", "");
+                formData.append("desc", document.getElementById(desc).value);
+                formData.append("locat", locat);
+
+                $http({
+                    method: "POST",
+                    url: "http://localhost:8080/Instagram_server/upload",
+                    data: formData,
+                    headers: {
+                        "Content-Type": undefined
+                    }
+
+                }).success(function (data) {
+                    console.log(data);
+                });
+            }
         }
     }
 ]);
